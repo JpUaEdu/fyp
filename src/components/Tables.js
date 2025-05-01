@@ -10,6 +10,38 @@ import { pageVisits, pageTraffic, pageRanking } from "../data/tables";
 import transactions from "../data/transactions";
 import commands from "../data/commands";
 
+// Add this inside your Tables.js file
+export const EngagementStatsTable = () => {
+  return (
+    <Table responsive className="table-centered table-nowrap rounded mb-0">
+      <thead className="thead-light">
+        <tr>
+          <th>Metric</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Number of Likes</td>
+          <td>5,230</td>
+        </tr>
+        <tr>
+          <td>Number of Comments</td>
+          <td>1,145</td>
+        </tr>
+        <tr>
+          <td>Retweet Numbers</td>
+          <td>890</td>
+        </tr>
+        <tr>
+          <td>Follower Growth</td>
+          <td>+1,200</td>
+        </tr>
+      </tbody>
+    </Table>
+  );
+};
+
 const ValueChange = ({ value, suffix }) => {
   const valueIcon = value < 0 ? faAngleDown : faAngleUp;
   const valueTxtColor = value < 0 ? "text-danger" : "text-success";
