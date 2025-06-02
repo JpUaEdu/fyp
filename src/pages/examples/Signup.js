@@ -4,6 +4,7 @@ import {
   faAngleLeft,
   faEnvelope,
   faUnlockAlt,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebookF,
@@ -20,15 +21,14 @@ import {
   Container,
   InputGroup,
 } from "@themesberg/react-bootstrap";
-import { Link } from "react-router-dom";
-
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase"; // Make sure this path matches your firebase.js
+import { Link, useHistory } from "react-router-dom";
 
 import { Routes } from "../../routes";
 import BgImage from "../../assets/img/illustrations/signin.svg";
 
 export default function Register() {
+  const history = useHistory();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -41,10 +41,24 @@ export default function Register() {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const response = await fetch("http://localhost:5000/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, full_name: fullName }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Signup failed");
+        return;
+      }
+
       alert("User registered successfully!");
+      history.push(Routes.Signin.path);
     } catch (error) {
-      alert(error.message);
+      console.error("Signup error:", error);
+      alert("Server error. Please try again.");
     }
   };
 
@@ -52,16 +66,6 @@ export default function Register() {
     <main>
       <section className="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
         <Container>
-          <p className="text-center">
-            <Card.Link
-              as={Link}
-              to={Routes.DashboardOverview.path}
-              className="text-gray-700"
-            >
-              <FontAwesomeIcon icon={faAngleLeft} className="me-2" /> Back to
-              homepage
-            </Card.Link>
-          </p>
           <Row
             className="justify-content-center form-bg-image"
             style={{ backgroundImage: `url(${BgImage})` }}
@@ -75,6 +79,24 @@ export default function Register() {
                   <h3 className="mb-0">Create an account</h3>
                 </div>
                 <Form className="mt-4" onSubmit={handleRegister}>
+                  {/* Full Name */}
+                  <Form.Group id="fullName" className="mb-4">
+                    <Form.Label>Full Name</Form.Label>
+                    <InputGroup>
+                      <InputGroup.Text>
+                        <FontAwesomeIcon icon={faUser} />
+                      </InputGroup.Text>
+                      <Form.Control
+                        required
+                        type="text"
+                        placeholder="John Doe"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                      />
+                    </InputGroup>
+                  </Form.Group>
+
+                  {/* Email */}
                   <Form.Group id="email" className="mb-4">
                     <Form.Label>Your Email</Form.Label>
                     <InputGroup>
@@ -91,6 +113,8 @@ export default function Register() {
                       />
                     </InputGroup>
                   </Form.Group>
+
+                  {/* Password */}
                   <Form.Group id="password" className="mb-4">
                     <Form.Label>Your Password</Form.Label>
                     <InputGroup>
@@ -106,6 +130,8 @@ export default function Register() {
                       />
                     </InputGroup>
                   </Form.Group>
+
+                  {/* Confirm Password */}
                   <Form.Group id="confirmPassword" className="mb-4">
                     <Form.Label>Confirm Password</Form.Label>
                     <InputGroup>
@@ -121,6 +147,7 @@ export default function Register() {
                       />
                     </InputGroup>
                   </Form.Group>
+
                   <FormCheck type="checkbox" className="d-flex mb-4">
                     <FormCheck.Input required id="terms" className="me-2" />
                     <FormCheck.Label htmlFor="terms">
