@@ -92,7 +92,16 @@ export default (props = {}) => {
             <Nav className="flex-column pt-3 pt-md-0">
               <NavItem title="Volt React" link={Routes.Presentation.path} icon={null} />
               <NavItem title="Overview" link={Routes.DashboardOverview.path} icon={faChartPie} />
-              <NavItem title="Transactions" link={Routes.Transactions.path} icon={faHandHoldingUsd} />
+              <NavItem
+                title="Prediction"
+                link={Routes.DashboardPrediction.path}
+                icon={faChartPie}
+              />
+              <NavItem
+                title="Feedback"
+                link={Routes.FeedbackDashboard.path}
+                icon={faHandHoldingUsd}
+              />             
               <NavItem title="Input" link={Routes.UserInput.path} icon={faCog} />
 
               <CollapsableNavItem eventKey="examples/" title="Page Examples" icon={faFileAlt}>

@@ -9,5 +9,7 @@ export const Routes = {
   ServerError: { path: "/examples/500" },
   DashboardOverview: { path: "/dashboard/overview" },
   Transactions: { path: "/transactions" },
-  UserInput: { path: "/examples/userInput" }
+  UserInput: { path: "/examples/userInput" },
+  DashboardPrediction: { path: "/dashboard/prediction" },
+  FeedbackDashboard: { path: "/dashboard/feedback" },
 };

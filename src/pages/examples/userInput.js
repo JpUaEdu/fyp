@@ -1,21 +1,44 @@
 import React, { useState } from "react";
 import { Container, Box, Typography, TextField, Button } from "@mui/material";
-
+import { useHistory } from "react-router-dom";
+ 
 export default function UserInput() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-
-  const handleSubmit = (e) => {
+  const [brand, setBrand] = useState("");
+  const [figure, setFigure] = useState("");
+  const history = useHistory();
+ 
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Name: ${name}, Email: ${email}`);
-    // You can store/send the data here
+ 
+    try {
+      const res = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brand, figure }),
+      });
+ 
+      const data = await res.json();
+      console.log("Prediction API response:", data);
+ 
+      // Save prediction + inputs
+      localStorage.setItem(
+        "prediction",
+        JSON.stringify({ brand, figure, ...data })
+      );
+ 
+      // Navigate to dashboard
+      history.push("/dashboard/prediction");
+    } catch (err) {
+      console.error("Error calling prediction API:", err);
+      alert("Prediction request failed – check console");
+    }
   };
-
+ 
   return (
     <Container maxWidth="sm">
       <Box sx={{ mt: 8 }}>
         <Typography variant="h5" gutterBottom>
-          User Input Form
+          Partnership Prediction
         </Typography>
         <form onSubmit={handleSubmit}>
           <TextField
@@ -23,22 +46,28 @@ export default function UserInput() {
             margin="normal"
             label="Brand"
             variant="outlined"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
           />
           <TextField
             fullWidth
             margin="normal"
-            label="Target"
+            label="Figure"
             variant="outlined"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={figure}
+            onChange={(e) => setFigure(e.target.value)}
           />
-          <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-            Submit
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 2 }}
+            disabled={!brand.trim() || !figure.trim()}
+          >
+            Predict
           </Button>
         </form>
       </Box>
     </Container>
   );
 }
+ 
