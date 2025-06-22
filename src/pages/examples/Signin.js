@@ -31,13 +31,15 @@ export default () => {
       return;
     }
 
-    localStorage.setItem("user", JSON.stringify(data));
+    // Store token in localStorage
+    localStorage.setItem("token", data.token);
     history.push(Routes.DashboardOverview.path);
   } catch (err) {
     console.error("Login error:", err);
     alert("Server error. Please try again.");
   }
 };
+
 
 
   return (

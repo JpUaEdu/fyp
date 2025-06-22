@@ -1,7 +1,32 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 const pool = require("../db");
 
+const SECRET_KEY = "your_secret_key"; // Replace with environment variable in production
+
+// SIGNUP
+router.post("/signup", async (req, res) => {
+  const { email, password, full_name } = req.body;
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO users (email, password, full_name) VALUES ($1, $2, $3) RETURNING user_id, email",
+      [email, password, full_name]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    if (err.code === "23505") {
+      res.status(400).json({ error: "Email already exists." });
+    } else {
+      console.error("Signup error:", err.message);
+      res.status(500).send("Server error");
+    }
+  }
+});
+
+// LOGIN
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -16,7 +41,15 @@ router.post("/login", async (req, res) => {
     }
 
     const user = result.rows[0];
-    res.json({ user_id: user.user_id, full_name: user.full_name });
+
+    const token = jwt.sign(
+  { id: user.user_id, full_name: user.full_name },
+  SECRET_KEY,
+  { expiresIn: "2h" }
+);
+
+
+    res.json({ token });
   } catch (err) {
     console.error("Login error:", err.message);
     res.status(500).send("Server error");
@@ -24,23 +57,3 @@ router.post("/login", async (req, res) => {
 });
 
 module.exports = router;
-
-router.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const result = await pool.query(
-      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING user_id, email",
-      [email, password]
-    );
-
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    if (err.code === '23505') {
-      res.status(400).json({ error: "Email already exists." });
-    } else {
-      console.error("Signup error:", err.message);
-      res.status(500).send("Server error");
-    }
-  }
-});
